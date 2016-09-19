@@ -43,7 +43,7 @@ LinkedList<String> translate(LinkedList<String> array) {
   }
   LinkedList<String> translation = new LinkedList<String>();
   String after = merge(trans);
-  for(int i = 0; i < after.length(); i++){
+  for (int i = 0; i < after.length(); i++) {
     translation.add(after.substring(i, i+1));
   }
   return translation;

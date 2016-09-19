@@ -1,4 +1,4 @@
-import java.util.LinkedList;
+/*import java.util.LinkedList;
 
 int mode;
 int pointX, pointY;
@@ -60,4 +60,4 @@ void draw() {
     line(mouseX, mouseY, mouseX-len*cos(rad-PI/6), mouseY-len*sin(rad-PI/6));
   }
   alpha = (alpha <= 0 ? 0 : alpha-1);
-}
+}*/

@@ -1,6 +1,7 @@
 class TextBox {
 
-  int x, y, width, height, h, s, b, order, number;
+  float x, y, width, height;
+  int h, s, b, order, number;
   int grip = -1;
   int index = 0;
   float Lpos = 0;
@@ -14,7 +15,7 @@ class TextBox {
   LinkedList<String> text = new LinkedList<String>();
   LinkedList<Id> idList = new LinkedList<Id>();
 
-  TextBox(int _x, int _y, int _width, int _height, int _h, int _s, int _b, int Porder_, int Pnumber_) {
+  TextBox(float _x, float _y, float _width, float _height, int _h, int _s, int _b, int Porder_, int Pnumber_) {
     x      = _x;
     y      = _y;
     width  = _width;
@@ -28,10 +29,13 @@ class TextBox {
   void display(boolean select) {
     if (!pSelect && select) this.index = 0;
     if (mode == 1) {
-      if (grip == 0) {
-        extend();
-      } else if (grip == 1) {
-        move();
+      //亀田 mapFlagがtrueの時 移動、拡大縮小不可能
+      if (!mapFlag) {
+        if (grip == 0) {
+          extend();
+        } else if (grip == 1) {
+          move();
+        }
       }
     }
     stroke(0);
@@ -57,18 +61,18 @@ class TextBox {
     pboxPressed   = bounds();
     pSelect       = select;
   }
-  
+
   void move() {
     if (!proundPressed && mousePressed) {
       if (this.width > 0) {
-        x += (mouseX - pmouseX);
+        x += (changedMouseX - changedPMouseX);
       } else {
-        x += (mouseX - pmouseX);
+        x += (changedMouseX - changedPMouseX);
       }
       if (this.height > 0) {
-        y += (mouseY - pmouseY);
+        y += (changedMouseY - changedPMouseY);
       } else {
-        y += (mouseY - pmouseY);
+        y += (changedMouseY - changedPMouseY);
       }
     }
   }
@@ -76,16 +80,20 @@ class TextBox {
   void extend() {
     if ((round() || proundPressed )&& mousePressed) {
       if (this.width > 0) {
-        this.width  += mouseX - pmouseX;
+        this.width  += changedMouseX - changedPMouseX;
+        //this.width = changedMouseX;
       } else {
-        this.x  += mouseX - pmouseX;
-        this.width -= mouseX - pmouseX;
+        this.x  += changedMouseX - changedPMouseX;
+        this.width -= changedMouseX - changedPMouseX;
+        //this.width = changedMouseX;
       }
       if (this.height > 0) {
-        this.height += mouseY - pmouseY;
+        this.height += changedMouseY - changedPMouseY;
+        //this.height = changedMouseY;
       } else {
-        this.y += mouseY - pmouseY;
-        this.height -= mouseY - pmouseY;
+        this.y += changedMouseY - changedPMouseY;
+        this.height -= changedMouseY - changedPMouseY;
+        //this.height = changedMouseY;
       }
     }
     if (abs(this.width) < 60) this.width = 60 * this.width / abs(this.width);
@@ -93,22 +101,22 @@ class TextBox {
   }
 
   boolean round() {
-    float r = dist(mouseX, mouseY, x + (this.width > 0 ? this.width : 0) - 10, y + (this.height > 0 ? this.height : 0) - 10);
+    float r = dist(changedMouseX, changedMouseY, x + (this.width > 0 ? this.width : 0) - 10, y + (this.height > 0 ? this.height : 0) - 10);
     return r <= 20;
   }
 
   boolean bounds() {
     if (this.width > 0) {
       if (this.height > 0) {
-        return (mouseX >= x && mouseX < x + this.width && mouseY >= y && mouseY < y + this.height);
+        return (changedMouseX >= x && changedMouseX < x + this.width && changedMouseY >= y && changedMouseY < y + this.height);
       } else {
-        return (mouseX >= x && mouseX < x + this.width && mouseY <= y && mouseY > y + this.height);
+        return (changedMouseX >= x && changedMouseX < x + this.width && changedMouseY <= y && changedMouseY > y + this.height);
       }
     } else {
       if (this.height > 0) {
-        return (mouseX <= x && mouseX > x + this.width && mouseY >= y && mouseY < y + this.height);
+        return (changedMouseX <= x && changedMouseX > x + this.width && changedMouseY >= y && changedMouseY < y + this.height);
       } else {
-        return (mouseX <= x && mouseX > x + this.width && mouseY <= y && mouseY > y + this.height);
+        return (changedMouseX <= x && changedMouseX > x + this.width && changedMouseY <= y && changedMouseY > y + this.height);
       }
     }
   }
@@ -254,4 +262,3 @@ class TextBox {
     return text.size() - prefix;
   }
 }
-

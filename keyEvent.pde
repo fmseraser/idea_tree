@@ -114,6 +114,11 @@ void keyPressed() {
         list.get(sId.order).get(sId.number).t.add(list.get(sId.order).get(sId.number).text.size()-list.get(sId.order).get(sId.number).index, "ー");
       }
       break;
+
+    case ALT:  //亀田
+      mapFlag = true;
+      break;
+
     default:
       if (sId.order != -1 && sId.number != -1) {
         list.get(sId.order).get(sId.number).t.add(list.get(sId.order).get(sId.number).text.size()-list.get(sId.order).get(sId.number).index, "" + key + "");
@@ -137,6 +142,10 @@ void keyReleased() {
   case CONTROL:
     boolCtrl = false;
     break;
+
+  case ALT:  //亀田
+    mapFlag = false;
+    break;
   }
   switch(key) {
   case 's':
@@ -147,4 +156,3 @@ void keyReleased() {
     break;
   }
 }
-

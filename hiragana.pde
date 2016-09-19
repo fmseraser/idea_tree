@@ -268,4 +268,3 @@ void convert_set() {
   convert.put("xyu", "ゅ");
   convert.put("xyo", "ょ");
 }
-
