@@ -9,14 +9,14 @@ String [] English = {
   "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
 };
 
-StringList translate(StringList array) {
+LinkedList<String> translate(LinkedList<String> array) {
   String original  = merge(array);
-  StringList trans = new StringList();
+  LinkedList<String> trans = new LinkedList<String>();
   if (original.length() == 1) {
     if (convert.get(original) != null) {
-      trans.append(convert.get(original));
+      trans.add(convert.get(original));
     } else {
-      trans.append(original);
+      trans.add(original);
     }
     return trans;
   }
@@ -26,32 +26,32 @@ StringList translate(StringList array) {
     original = original.substring(temp.length(), original.length());
   }
   for (int i = 0; i < original.length()-2; i++) {
-    trans.append(original.substring(i, i+1));
+    trans.add(original.substring(i, i+1));
   }
   try {
     if (array.get(array.size()-1).equals("n") && array.get(array.size()-2).equals("n")) {
-      trans.append("ん");
+      trans.add("ん");
     } else if (array.get(array.size()-1).equals(array.get(array.size()-2)) && english(array.get(array.size()-1))) {
-      trans.append("っ");
-      trans.append(original.substring(original.length()-1, original.length()));
+      trans.add("っ");
+      trans.add(original.substring(original.length()-1, original.length()));
     } else {
-      trans.append(original.substring(original.length()-2, original.length()-1));
-      trans.append(original.substring(original.length()-1, original.length()));
+      trans.add(original.substring(original.length()-2, original.length()-1));
+      trans.add(original.substring(original.length()-1, original.length()));
     }
   }
   catch(IndexOutOfBoundsException e) {
   }
-  StringList translation = new StringList();
+  LinkedList<String> translation = new LinkedList<String>();
   String after = merge(trans);
   for(int i = 0; i < after.length(); i++){
-    translation.append(after.substring(i, i+1));
+    translation.add(after.substring(i, i+1));
   }
   return translation;
 }
 
-StringList convert(StringList array, String temp) {
+LinkedList<String> convert(LinkedList<String> array, String temp) {
   if (convert.get(temp) != null) {
-    array.append(convert.get(temp));
+    array.add(convert.get(temp));
   } else {
     String end   = "";
     int endIndex = temp.length();
@@ -67,21 +67,21 @@ StringList convert(StringList array, String temp) {
     }
     for (int i = 0; i < endIndex; i++) {
       if (english(temp.substring(i, i+1)) == false) {
-        array.append(temp.substring(i, i+1));
+        array.add(temp.substring(i, i+1));
       } else if (temp.substring(i, i+1).equals("n")) {
-        array.append("ん");
+        array.add("ん");
       } else if (temp.substring(i, i+1).equals(temp.substring(i+1, i+2))) {
-        array.append("っ");
+        array.add("っ");
       } else {
-        array.append(temp.substring(i, i+1));
+        array.add(temp.substring(i, i+1));
       }
     }
-    array.append(end);
+    array.add(end);
   }
   return array;
 }
 
-String merge(StringList array) {
+String merge(LinkedList<String> array) {
   String merge = "";
   for (int i = 0; i < array.size (); i++) {
     merge += array.get(i);

@@ -2,17 +2,21 @@ class TextBox {
 
   int x, y, width, height, h, s, b, order, number;
   int grip = -1;
+  int index = 0;
+  float Lpos = 0;
+  float Rpos = 0;
+  boolean pSelect       = false;
   boolean proundPressed = false;
   boolean pboxPressed   = false;
   boolean pmousePressed = false;
   String Text;
-  StringList t    = new StringList();
-  StringList text = new StringList();
+  LinkedList<String> t    = new LinkedList<String>();
+  LinkedList<String> text = new LinkedList<String>();
   LinkedList<Id> idList = new LinkedList<Id>();
 
-  TextBox(int x_, int y_, int _width, int _height, int _h, int _s, int _b, int Porder_, int Pnumber_) {
-    x      = x_;
-    y      = y_;
+  TextBox(int _x, int _y, int _width, int _height, int _h, int _s, int _b, int Porder_, int Pnumber_) {
+    x      = _x;
+    y      = _y;
     width  = _width;
     height = _height;
     h      = _h;
@@ -21,7 +25,8 @@ class TextBox {
     idList.add(new Id(Porder_, Pnumber_));
   }
 
-  void display() {
+  void display(boolean select) {
+    if (!pSelect && select) this.index = 0;
     if (mode == 1) {
       if (grip == 0) {
         extend();
@@ -31,28 +36,39 @@ class TextBox {
     }
     stroke(0);
     strokeWeight(4);
-    fill(h, s, b, 180);
+    fill(h, s, b, (select ? 220 : 180));
     rect(x, y, width, height, 20);
     fill(0);
     text = translate(t);
-    textSize(abs(this.width) < abs(this.height) ? abs(this.width)*0.3 : abs(this.height)*0.3);
+    float _h = (this.height/countLine())*0.6;
+    textSize(_h > 1 ? _h : 1);
+    if (this.width < maxRowWidth()) {
+      _h = _h * this.width / maxRowWidth() * 0.85;
+      textSize(_h > 1 ? _h : 1);
+    }
+    if (pow(-1, (int)millis()/500) == 1 && select) {
+      setPos();
+      endLine();
+    }
+    textLeading(_h+10);
     text(merge(text), x+this.width/2, y+this.height/2);
     t             = text;
     pmousePressed = mousePressed;
     pboxPressed   = bounds();
+    pSelect       = select;
   }
-
+  
   void move() {
     if (!proundPressed && mousePressed) {
       if (this.width > 0) {
-        x += (mouseX - pmouseX) / 2;
+        x += (mouseX - pmouseX);
       } else {
-        x += (mouseX - pmouseX) / 2;
+        x += (mouseX - pmouseX);
       }
       if (this.height > 0) {
-        y += (mouseY - pmouseY) / 2;
+        y += (mouseY - pmouseY);
       } else {
-        y += (mouseY - pmouseY) / 2;
+        y += (mouseY - pmouseY);
       }
     }
   }
@@ -60,16 +76,16 @@ class TextBox {
   void extend() {
     if ((round() || proundPressed )&& mousePressed) {
       if (this.width > 0) {
-        this.width  += (mouseX - pmouseX) * 0.67;
+        this.width  += mouseX - pmouseX;
       } else {
-        this.x  += (mouseX - pmouseX) * 0.67;
-        this.width -= (mouseX - pmouseX) * 0.67;
+        this.x  += mouseX - pmouseX;
+        this.width -= mouseX - pmouseX;
       }
       if (this.height > 0) {
-        this.height += (mouseY - pmouseY) * 0.67;
+        this.height += mouseY - pmouseY;
       } else {
-        this.y += (mouseY - pmouseY) * 0.67;
-        this.height -= (mouseY - pmouseY) * 0.67;
+        this.y += mouseY - pmouseY;
+        this.height -= mouseY - pmouseY;
       }
     }
     if (abs(this.width) < 60) this.width = 60 * this.width / abs(this.width);
@@ -101,9 +117,9 @@ class TextBox {
     return (mousePressed && !pmousePressed && bounds());
   }
 
-  void displayLine(int i, int j) {
+  void displayLine() {
     stroke(0, 0, 0, 180);
-    strokeWeight(4);
+    strokeWeight(3);
     for (int k=0; k<idList.size (); k++) {
       if (idList.get(k).order<0||idList.get(k).number<0)continue;
       if (idList.get(k).order+1>list.size())continue;
@@ -111,4 +127,131 @@ class TextBox {
       if (idList.get(k).order!=-1)line(x+width/2, y+height/2, list.get(idList.get(k).order).get(idList.get(k).number).x + list.get(idList.get(k).order).get(idList.get(k).number).width/2, list.get(idList.get(k).order).get(idList.get(k).number).y + list.get(idList.get(k).order).get(idList.get(k).number).height/2);
     }
   }
+
+  int countLine() {
+    int cnt = 1;
+    for (int i = 0; i < this.text.size (); i++) {
+      if (text.get(i).equals("\n")) cnt++;
+    }
+    return cnt;
+  }
+
+  int currentLine() {
+    int cnt = 1;
+    int current = text.size() - this.index;
+    for (int i = 0; i < current; i++) {
+      if (i >= this.text.size()) break;
+      if (this.text.get(i).equals("\n")) {
+        cnt++;
+      }
+    }
+    return cnt;
+  }
+
+  int currentLinePrefix() {
+    int current = this.text.size() - this.index;
+    String original = merge(this.text);
+    for (int i = 1; i < currentLine (); i++) {
+      current -= original.indexOf("\n")+1;
+      original = original.substring(original.indexOf("\n")+1);
+    }
+    return current;
+  }
+
+  float maxRowWidth() {
+    float max = 0;
+    String original = merge(this.text);
+    for (; original.indexOf ("\n") != -1; ) {
+      String temp = original.substring(0, original.indexOf("\n"));
+      max = (textWidth(temp) > max ? textWidth(temp) : max);
+      original = original.substring(original.indexOf("\n")+1);
+    }
+    max = (textWidth(original) > max ? textWidth(original) : max);
+    return max;
+  }
+
+  float currentRowWidth() {
+    int current = text.size() - this.index;
+    String original = merge(this.text);
+    if (original.length() == 0) return 0;
+    for (int i = 0; i < this.currentLine ()-1; i++) {
+      current -= original.indexOf("\n");
+      current--;
+      original = original.substring(original.indexOf("\n")+1);
+    }
+    float lineWidth = (original.indexOf("\n") != -1 ? textWidth(original.substring(0, original.indexOf("\n"))) : textWidth(original));
+    return textWidth(original.substring(0, current)) - lineWidth/2;
+  }
+
+  void endLine() {
+    float _x = this.Rpos + this.x + this.width/2;
+    float _y = this.Lpos + this.y + this.height/2;
+    strokeWeight(1);
+    line(_x, _y - textAscent(), _x, _y + textDescent());
+  }
+
+  int getIndex(int line) {
+    int cnt = 0;
+    int el  = 1;
+    for (int i = 0; el <= line; i++) {
+      if (i >= this.text.size()) break;
+      if (this.text.get(i).equals("\n")) el++;
+      cnt++;
+    }
+    int _in = this.text.size() - cnt - 1;
+    return _in;
+  }
+
+  void setPos() {
+    float h = textAscent() + textDescent() + 10;
+    if (this.countLine() % 2 == 1) {
+      this.Lpos = h * (currentLine() - ceil(countLine()/2.0) + 0.37);
+      this.Rpos = this.currentRowWidth();
+    } else {
+      this.Lpos = h * (currentLine() - this.countLine()/2 - 0.15);
+      this.Rpos = this.currentRowWidth();
+    }
+  }
+
+  boolean homePos() {
+    int current = this.text.size() - this.index;
+    return current == 0 || this.text.get(current-1).equals("\n");
+  }
+
+  String lineText(int line) {
+    String original = merge(this.text);
+    for (int i = 1; i < line; i++) {
+      original = original.substring(original.indexOf("\n")+1);
+    }
+    if (original.indexOf("\n") != -1) {
+      original = original.substring(0, original.indexOf("\n"));
+    }
+    return original;
+  }
+
+  int lineLength(int line) {
+    String original = merge(this.text);
+    for (int i = 1; i < line; i++) {
+      original = original.substring(original.indexOf("\n")+1);
+    }
+    if (original.indexOf("\n") != -1) {
+      original = original.substring(0, original.indexOf("\n"));
+    }
+    return original.length();
+  }
+
+  int centerGap() {
+    return this.currentLinePrefix() - this.lineLength(this.currentLine())/2;
+  }
+
+  int lineHomeIndex(int line) {
+    int prefix = 1;
+    String original = merge(this.text);
+    for (int i = 1; i < line; i++) {
+      prefix += original.indexOf("\n")+1;
+      original = original.substring(original.indexOf("\n")+1);
+    }
+    return text.size() - prefix;
+  }
 }
+

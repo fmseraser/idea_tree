@@ -60,7 +60,7 @@ void mouseReleased() {
   switch(mode) {
   case 0://アイテム作成
     if (pointX == -100 && pointY == -100) return;
-    if (sId.order != -1) {
+    if (sId.order != -1 && sId.number != -1) {
       list.add(new LinkedList<TextBox>());
       list.get(sId.order+1).add(new TextBox(pointX, pointY, (mouseX-pointX >= 0 ? (mouseX-pointX > 90 ? mouseX-pointX : 90) : (mouseX-pointX < -90 ? mouseX-pointX : -90)), (mouseY-pointY >= 0 ? (mouseY-pointY > 60 ? mouseY-pointY : 60) : (mouseY-pointY < -60 ? mouseY-pointY : -60)), list.get(sId.order).get(sId.number).h+7, int(list.get(sId.order).get(sId.number).s-5), int(list.get(sId.order).get(sId.number).b-5), sId.order, sId.number));
     } else {

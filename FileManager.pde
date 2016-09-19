@@ -44,7 +44,7 @@ class FileManager {
       //  Integer.parseInt(line[4]), Integer.parseInt(line[5]), Integer.parseInt(line[7]), Integer.parseInt(line[8])));
       int j = 1;
       for (; j < Integer.parseInt (line[6]); j++) list_.get(order).get(number).idList.add(new Id(Integer.parseInt(line[7+j*2]), Integer.parseInt(line[8+j*2])));
-      for (int k = 7+j*2; k < line.length; k++) list_.get(order).get(number).t.append(line[k]);
+      for (int k = 7+j*2; k < line.length; k++) list_.get(order).get(number).t.add(line[k]);
     }
     println("\nloaded data");
     alpha = 50;

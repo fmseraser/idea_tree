@@ -267,6 +267,5 @@ void convert_set() {
   convert.put("xya", "ゃ");
   convert.put("xyu", "ゅ");
   convert.put("xyo", "ょ");
-  
-  convert.put("nn", "ん");
 }
+
